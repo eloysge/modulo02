@@ -5,6 +5,7 @@ import User from '../models/User';
 import File from '../models/File';
 import Appointment from '../models/Appointment';
 import Notification from '../schemas/Notification';
+import Mail from '../../lib/Mail';
 
 class AppointmentController {
   async index(req, res) {
@@ -23,7 +24,7 @@ class AppointmentController {
         {
           model: User,
           as: 'provider',
-          attributes: ['id', 'name'],
+          attributes: ['id', 'name', 'email'],
           include: [
             {
               model: File,
@@ -118,7 +119,21 @@ class AppointmentController {
   }
 
   async delete(req, res) {
-    const appointment = await Appointment.findByPk(req.params.id);
+    const appointment = await Appointment.findByPk(req.params.id, {
+      include: [
+        {
+          model: User,
+          as: 'provider',
+          attributes: ['name', 'email'],
+        },
+        {
+          model: User,
+          as: 'user',
+          attributes: ['name'],
+        },
+      ],
+    });
+
     if (!appointment) {
       res
         .status(400)
@@ -145,13 +160,27 @@ class AppointmentController {
       res.status(401).json({
         error: `Cancelamento não permitido. Ultrapassou a data limite: ${format(
           dateSub,
-          'dd/mm/yyyy HH:mm'
+          'dd/MM/yyyy HH:mm'
         )}`,
       });
     }
 
     appointment.canceled_at = new Date();
     await appointment.save();
+
+    /**
+     * Envio de email
+     */
+    await Mail.sendMail({
+      to: `${appointment.provider.name} <${appointment.provider.email}>`,
+      subject: 'Agendamento cancelado',
+      template: 'cancellation',
+      context: {
+        provider: appointment.provider.name,
+        user: appointment.user.name,
+        date: format(appointment.date, 'dd/MM/yyyy HH:mm'),
+      },
+    });
 
     return res.json(appointment);
   }

@@ -1,5 +1,5 @@
 import * as Yup from 'yup';
-import { startOfHour, parseISO, isBefore, format } from 'date-fns';
+import { startOfHour, parseISO, isBefore, format, subHours } from 'date-fns';
 import pt from 'date-fns/locale/pt';
 import User from '../models/User';
 import File from '../models/File';
@@ -67,6 +67,7 @@ class AppointmentController {
         .status(401)
         .json({ error: 'Agendamento apenas permitido para [providers]' });
     }
+
     /**
      * Checar se a data é posterior
      */
@@ -112,6 +113,45 @@ class AppointmentController {
       content: `Novo agendamento de ${user.name} para ${formattedDate}`,
       user: provider_id,
     });
+
+    return res.json(appointment);
+  }
+
+  async delete(req, res) {
+    const appointment = await Appointment.findByPk(req.params.id);
+    if (!appointment) {
+      res
+        .status(400)
+        .json({ error: `Apontamento: ${req.params.id} não localizado.` });
+    }
+
+    if (appointment.canceled_at) {
+      res.status(401).json({
+        error: `Esse apontamento já foi cancelado em: ${format(
+          appointment.canceled_at,
+          'dd/MM/yyyy HH:mm'
+        )}.`,
+      });
+    }
+
+    if (appointment.user_id !== req.userID) {
+      res.status(401).json({
+        error: `Você não pode cancelar esse Apontamento: ${req.params.id}.`,
+      });
+    }
+
+    const dateSub = subHours(appointment.date, 2);
+    if (isBefore(dateSub, new Date())) {
+      res.status(401).json({
+        error: `Cancelamento não permitido. Ultrapassou a data limite: ${format(
+          dateSub,
+          'dd/mm/yyyy HH:mm'
+        )}`,
+      });
+    }
+
+    appointment.canceled_at = new Date();
+    await appointment.save();
 
     return res.json(appointment);
   }

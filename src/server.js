@@ -76,4 +76,20 @@ app.listen(3333);
  * instalando dependencia:
  * yarn add date-fns@next
  *
+ * ENVIO DE EMAIL
+ * instalando dependencias:
+ * yarn add express-handlebars
+ * yarn add nodemailer-express-handlebars
+ *
+ * REDIS - BANCO CHAVE=VALOR NÃO RELACIONAL
+ * instalação via Docker
+ * docker run --name redisdb -p 6379:6379 -d -t redis:alpine
+ * (auto-restart)
+ * docker update --restart=unless-stopped redisdb
+ *
+ * BEE QUEUE - FILAS DE JOBS
+ * instalação dependencias:
+ * yarn add bee-queue
+ *
+ *
  */

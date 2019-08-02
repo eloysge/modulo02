@@ -91,5 +91,10 @@ app.listen(3333);
  * instalação dependencias:
  * yarn add bee-queue
  *
+ * TRATAMENTO DE ERROS
+ * instalação dependencias:
+ * yarn add @sentry/node@5.5.0 (ver versão na documentação do site sentry)
+ * yarn add express-async-errors (para o sentry pegar os erros async/await)
+ * yarn add youch (tratamento das mensagens de erros para o usuário)
  *
  */

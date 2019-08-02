@@ -18,7 +18,14 @@ class AppointmentController {
         canceled_at: null,
       },
       order: ['date'],
-      attributes: ['id', 'date', 'user_id', 'provider_id'],
+      attributes: [
+        'id',
+        'date',
+        'user_id',
+        'provider_id',
+        'past',
+        'cancelable',
+      ],
       limit: 3,
       offset: (page - 1) * 3,
       include: [
@@ -136,13 +143,13 @@ class AppointmentController {
     });
 
     if (!appointment) {
-      res
+      return res
         .status(400)
         .json({ error: `Apontamento: ${req.params.id} não localizado.` });
     }
 
     if (appointment.canceled_at) {
-      res.status(401).json({
+      return res.status(401).json({
         error: `Esse apontamento já foi cancelado em: ${format(
           appointment.canceled_at,
           'dd/MM/yyyy HH:mm'
@@ -151,14 +158,14 @@ class AppointmentController {
     }
 
     if (appointment.user_id !== req.userID) {
-      res.status(401).json({
+      return res.status(401).json({
         error: `Você não pode cancelar esse Apontamento: ${req.params.id}.`,
       });
     }
 
     const dateSub = subHours(appointment.date, 2);
     if (isBefore(dateSub, new Date())) {
-      res.status(401).json({
+      return res.status(401).json({
         error: `Cancelamento não permitido. Ultrapassou a data limite: ${format(
           dateSub,
           'dd/MM/yyyy HH:mm'

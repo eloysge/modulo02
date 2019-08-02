@@ -2,7 +2,7 @@ import { format, parseISO } from 'date-fns';
 import Mail from '../../lib/Mail';
 
 class CancellationMail {
-  get Key() {
+  get key() {
     return 'CancellationMail';
   }
 

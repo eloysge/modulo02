@@ -21,10 +21,10 @@ class Database {
   }
 
   async mongo() {
-    this.mongoConnection = await Mongoose.connect(
-      'mongodb://192.168.0.78:27017/gobarber',
-      { useNewUrlParser: true, useFindAndModify: true }
-    );
+    this.mongoConnection = await Mongoose.connect(process.env.MONGO_URL, {
+      useNewUrlParser: true,
+      useFindAndModify: true,
+    });
   }
 }
 

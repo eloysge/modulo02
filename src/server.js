@@ -97,4 +97,8 @@ app.listen(3333);
  * yarn add express-async-errors (para o sentry pegar os erros async/await)
  * yarn add youch (tratamento das mensagens de erros para o usuário)
  *
+ * ARQUIVO DE CONFIGURAÇÃO DE AMBIENTE (.env)
+ * instalação dependencias:
+ * yarn add dotenv
+ *
  */

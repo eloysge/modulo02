@@ -20,7 +20,7 @@ class UserController {
 
     const checkEmail = await User.findOne({ where: { email: req.body.email } });
     if (checkEmail) {
-      return res.status(400).json({ error: 'Email já cadastrado !' });
+      return res.status(422).json({ error: 'E-mail já cadastrado' });
     }
 
     const { id, name, email, provider } = await User.create(req.body);

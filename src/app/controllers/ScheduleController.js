@@ -1,7 +1,32 @@
-import { startOfDay, endOfDay, parseISO } from 'date-fns';
+import {
+  startOfDay,
+  endOfDay,
+  parseISO,
+  setHours,
+  setMinutes,
+  setSeconds,
+  isEqual,
+  isBefore,
+} from 'date-fns';
+import { utcToZonedTime } from 'date-fns-tz';
 import { Op } from 'sequelize';
 import Appointment from '../models/Appointment';
 import User from '../models/User';
+
+const range = [
+  '08:00',
+  '09:00',
+  '10:00',
+  '11:00',
+  '12:00',
+  '13:00',
+  '14:00',
+  '15:00',
+  '16:00',
+  '17:00',
+  '18:00',
+  '19:00',
+];
 
 class ScheduleController {
   async index(req, res) {
@@ -11,6 +36,7 @@ class ScheduleController {
         provider: true,
       },
     });
+
     if (!checkUserProvider) {
       return res
         .status(401)
@@ -18,6 +44,19 @@ class ScheduleController {
     }
 
     const { date } = req.query;
+    if (!date) {
+      return res
+        .status(401)
+        .json({ error: 'O parâmetro [date] é obrigatório' });
+    }
+
+    const { timezone } = req.query;
+    if (!timezone) {
+      return res
+        .status(401)
+        .json({ error: 'O parâmetro [timezone] é obrigatório' });
+    }
+
     const parsedDate = parseISO(date);
 
     const appointments = await Appointment.findAll({
@@ -38,7 +77,21 @@ class ScheduleController {
       order: ['date'],
     });
 
-    return res.json(appointments);
+    const data = range.map(hour => {
+      const [hora, minuto] = hour.split(':');
+      const checkDate = setSeconds(
+        setMinutes(setHours(parsedDate, hora), minuto),
+        0
+      );
+      const compareDate = utcToZonedTime(checkDate, timezone);
+      return {
+        time: `${hora}:${minuto}h`,
+        past: isBefore(compareDate, new Date()),
+        appointment: appointments.find(a => isEqual(a.date, compareDate)),
+      };
+    });
+
+    return res.json(data);
   }
 }
 

@@ -38,6 +38,6 @@
   },
   "scripts": {
     "dev": "nodemon src/server.js",
-    "job": "nodemon src/queues.js"
+    "queue": "nodemon src/queues.js"
   }
 }

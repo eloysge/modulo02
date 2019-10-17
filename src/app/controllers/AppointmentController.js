@@ -6,7 +6,9 @@ import File from '../models/File';
 import Appointment from '../models/Appointment';
 import Notification from '../schemas/Notification';
 import CancellationMail from '../jobs/CancellationMail';
+import AppointmentMail from '../jobs/AppointmentMail';
 import Queue from '../../lib/Queue';
+// import Mail from '../../lib/Mail';
 
 class AppointmentController {
   async index(req, res) {
@@ -17,7 +19,6 @@ class AppointmentController {
         user_id: req.userID,
         canceled_at: null,
       },
-      order: ['date'],
       attributes: [
         'id',
         'date',
@@ -26,8 +27,8 @@ class AppointmentController {
         'past',
         'cancelable',
       ],
-      limit: 3,
-      offset: (page - 1) * 3,
+      limit: 20,
+      offset: (page - 1) * 20,
       include: [
         {
           model: User,
@@ -42,6 +43,7 @@ class AppointmentController {
           ],
         },
       ],
+      order: [['date', 'DESC']],
     });
     return res.json(appointment);
   }
@@ -52,15 +54,12 @@ class AppointmentController {
       date: Yup.date().required(),
     });
 
-    // eslint-disable-next-line func-names
-    await schema.validate(req.body).catch(function(err) {
-      return res
-        .status(400)
-        .json({ error: 'Falha na validação dos dados', type: [err.errors] });
-    });
-
     if (!(await schema.isValid(req.body))) {
-      return res.json({ error: 'Falha na validação' });
+      await schema.validate(req.body).catch(err => {
+        const { message } = err;
+        return res.json({ error: message });
+      });
+      return res.status(400);
     }
 
     const { provider_id, date } = req.body;
@@ -73,8 +72,10 @@ class AppointmentController {
     });
     if (!isProvider) {
       return res
-        .status(401)
-        .json({ error: 'Agendamento apenas permitido para [providers]' });
+        .json({
+          error: 'Agendamento apenas permitido para [providers]',
+        })
+        .status(400);
     }
 
     /**
@@ -82,9 +83,29 @@ class AppointmentController {
      */
     const hourStart = startOfHour(parseISO(date));
     if (isBefore(hourStart, new Date())) {
-      return res.status(400).json({
-        error: `A data do agendamento deve ser posterior a ${Date()}`,
-      });
+      return res
+        .json({
+          error: `A data do agendamento deve ser posterior a ${Date()}`,
+        })
+        .status(400);
+    }
+
+    /**
+     * Checar conflito de agendamento para usuario
+     */
+    const checkConflit = await Appointment.findOne({
+      where: {
+        user_id: req.userID,
+        canceled_at: null,
+        date: hourStart,
+      },
+    });
+    if (checkConflit) {
+      return res
+        .json({
+          error: 'Você já tem um agendamento para este horário',
+        })
+        .status(400);
     }
 
     /**
@@ -99,8 +120,8 @@ class AppointmentController {
     });
     if (checkAvailable) {
       return res
-        .status(400)
-        .json({ error: 'A data do agendamento não está disponível' });
+        .json({ error: 'A data do agendamento não está disponível' })
+        .status(400);
     }
 
     const appointment = await Appointment.create({
@@ -113,17 +134,36 @@ class AppointmentController {
      * Noficar agendamento ao provider
      */
     const user = await User.findByPk(req.userID);
-
     const formattedDate = format(hourStart, "'dia' dd 'de' MMMM 'às' H:mm'h'", {
       locale: pt,
     });
-
     await Notification.create({
       content: `Novo agendamento de ${user.name} para ${formattedDate}`,
       user: provider_id,
     });
 
-    return res.json(appointment);
+    /**
+     * Envio de email por Queue
+     */
+    const newAppointment = await Appointment.findByPk(appointment.id, {
+      include: [
+        {
+          model: User,
+          as: 'provider',
+          attributes: ['name', 'email'],
+        },
+        {
+          model: User,
+          as: 'user',
+          attributes: ['name'],
+        },
+      ],
+    });
+    await Queue.add(AppointmentMail.key, {
+      newAppointment,
+    });
+
+    return res.json(newAppointment);
   }
 
   async delete(req, res) {

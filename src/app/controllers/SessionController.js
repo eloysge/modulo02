@@ -8,13 +8,19 @@ class SessionController {
   async store(req, res) {
     const schema = Yup.object().shape({
       email: Yup.string()
-        .email()
-        .required(),
-      password: Yup.string().required(),
+        .email('E-mail é inválido')
+        .required('O e-mail é obrigatório'),
+      password: Yup.string()
+        .required('A senha é obrigatória')
+        .min(6, 'A senha deve ter no mínimo 6 dígitos'),
     });
 
     if (!(await schema.isValid(req.body))) {
-      return res.status(400).json({ error: 'Usuário e senha é obrigatório' });
+      await schema.validate(req.body).catch(err => {
+        const { message } = err;
+        return res.json({ error: message });
+      });
+      return res.status(400);
     }
 
     const { email, password } = req.body;
@@ -30,11 +36,11 @@ class SessionController {
     });
 
     if (!user) {
-      return res.status(401).json({ error: 'Usuário não cadastrado' });
+      return res.json({ error: 'Usuário não cadastrado.' }).status(401);
     }
 
     if (!(await user.checkPassword(password))) {
-      return res.status(401).json({ error: 'Senha não confere' });
+      return res.json({ error: 'Senha não confere' }).status(401);
     }
 
     const { id, name, avatar, provider } = user;

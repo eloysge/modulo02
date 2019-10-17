@@ -85,11 +85,10 @@ class AvailableController {
         time,
         value: format(value, "yyyy-MM-dd'T'HH:mm:ssxxx"),
         available: isAfter(value, new Date()) && !cliente,
-        dataClient: cliente,
       };
     });
 
-    return res.json({ available });
+    return res.json(available);
   }
 }
 

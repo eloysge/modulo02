@@ -5,22 +5,26 @@ import File from '../models/File';
 class UserController {
   async store(req, res) {
     const schema = Yup.object().shape({
-      name: Yup.string().required(),
+      name: Yup.string().required('O nome é obrigatório'),
       email: Yup.string()
         .email()
-        .required(),
+        .required('O e-mail é obrigatório'),
       password: Yup.string()
-        .required()
-        .min(6),
+        .required('A senha é obrigatória')
+        .min(6, 'A senha deve ter no mínimo 6 dígitos'),
     });
 
     if (!(await schema.isValid(req.body))) {
-      return res.status(400).json({ error: 'Falha na validação dos dados' });
+      await schema.validate(req.body).catch(err => {
+        const { message } = err;
+        return res.json({ error: message });
+      });
+      return res.status(400);
     }
 
     const checkEmail = await User.findOne({ where: { email: req.body.email } });
     if (checkEmail) {
-      return res.status(422).json({ error: 'E-mail já cadastrado' });
+      return res.json({ error: 'E-mail já cadastrado' });
     }
 
     const { id, name, email, provider } = await User.create(req.body);
@@ -34,11 +38,16 @@ class UserController {
 
   async update(req, res) {
     const schema = Yup.object().shape({
-      name: Yup.string(),
-      email: Yup.string().email(),
-      oldPassword: Yup.string().min(6),
+      name: Yup.string().required('Nome do usuário é obrigatório'),
+      email: Yup.string()
+        .email('E-mail informado é inválido')
+        .required('E-mail é obrigatório'),
+      oldPassword: Yup.string().min(
+        6,
+        'A senha atual deve ter no mínimo 6 dígitos'
+      ),
       password: Yup.string()
-        .min(6)
+        .min(6, 'A nova senha deve ter no mínimo 6 dígitos')
         .when('oldPassword', (oldPassword, field) =>
           oldPassword ? field.required() : field
         ),
@@ -54,16 +63,13 @@ class UserController {
       ),
     });
 
-    // eslint-disable-next-line func-names
-    await schema.validate(req.body).catch(function(err) {
-      return res
-        .status(400)
-        .json({ error: 'Falha na validação dos dados', type: [err.errors] });
-    });
-
-    // if (!(await schema.isValid(req.body))) {
-    //   return res.status(400).json({ error: 'Falha na validação dos dados' });
-    // }
+    if (!(await schema.isValid(req.body))) {
+      await schema.validate(req.body).catch(err => {
+        const { message } = err;
+        return res.json({ error: message });
+      });
+      return res.status(400);
+    }
 
     const { email, oldPassword, password } = req.body;
     const user = await User.findByPk(req.userID);
@@ -71,18 +77,18 @@ class UserController {
     if (email !== user.email) {
       const checkEmail = await User.findOne({ where: { email } });
       if (checkEmail) {
-        return res.status(400).json({ error: 'Email já cadastrado !' });
+        return res.json({ error: 'Email já cadastrado !' });
       }
     }
 
     if (password && !oldPassword) {
-      return res
-        .status(401)
-        .json({ error: 'Para alterar a senha, informe a senha anterior' });
+      return res.json({
+        error: 'Para alterar a senha, informe a senha anterior',
+      });
     }
 
     if (oldPassword && !(await user.checkPassword(oldPassword))) {
-      return res.status(401).json({ error: 'Senha anterior não confere' });
+      return res.json({ error: 'Senha anterior não confere' });
     }
 
     await user.update(req.body);

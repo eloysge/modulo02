@@ -1,5 +1,13 @@
 import * as Yup from 'yup';
-import { startOfHour, parseISO, isBefore, format, subHours } from 'date-fns';
+import { Op } from 'sequelize';
+import {
+  startOfHour,
+  parseISO,
+  isBefore,
+  format,
+  subHours,
+  subDays,
+} from 'date-fns';
 import pt from 'date-fns/locale/pt';
 import User from '../models/User';
 import File from '../models/File';
@@ -13,11 +21,15 @@ import Queue from '../../lib/Queue';
 class AppointmentController {
   async index(req, res) {
     const { page = 1 } = req.query;
+    const searchDate = Number(subDays(new Date(), 1));
 
     const appointment = await Appointment.findAll({
       where: {
         user_id: req.userID,
         canceled_at: null,
+        date: {
+          [Op.gte]: searchDate,
+        },
       },
       attributes: [
         'id',
@@ -50,8 +62,10 @@ class AppointmentController {
 
   async store(req, res) {
     const schema = Yup.object().shape({
-      provider_id: Yup.number().required(),
-      date: Yup.date().required(),
+      provider_id: Yup.number('O ID deve ser numérico').required(
+        'O ID é obrigatório'
+      ),
+      date: Yup.date('A Data deve ser válida').required('A Data é obrigatória'),
     });
 
     if (!(await schema.isValid(req.body))) {
@@ -82,10 +96,14 @@ class AppointmentController {
      * Checar se a data é posterior
      */
     const hourStart = startOfHour(parseISO(date));
+    const actualDate = format(new Date(), "dd/MM/yyyy H:mm'h'", {
+      locale: pt,
+    });
+
     if (isBefore(hourStart, new Date())) {
       return res
         .json({
-          error: `A data do agendamento deve ser posterior a ${Date()}`,
+          error: `A data do agendamento deve ser posterior a ${actualDate}`,
         })
         .status(400);
     }
@@ -143,7 +161,7 @@ class AppointmentController {
     });
 
     /**
-     * Envio de email por Queue
+     * Envio de email ao provider
      */
     const newAppointment = await Appointment.findByPk(appointment.id, {
       include: [
@@ -184,33 +202,39 @@ class AppointmentController {
 
     if (!appointment) {
       return res
-        .status(400)
-        .json({ error: `Apontamento: ${req.params.id} não localizado.` });
+        .json({ error: `Apontamento: ${req.params.id} não localizado.` })
+        .status(400);
     }
 
     if (appointment.canceled_at) {
-      return res.status(401).json({
-        error: `Esse apontamento já foi cancelado em: ${format(
-          appointment.canceled_at,
-          'dd/MM/yyyy HH:mm'
-        )}.`,
-      });
+      return res
+        .json({
+          error: `Esse apontamento já foi cancelado em: ${format(
+            appointment.canceled_at,
+            'dd/MM/yyyy HH:mm'
+          )}.`,
+        })
+        .status(401);
     }
 
     if (appointment.user_id !== req.userID) {
-      return res.status(401).json({
-        error: `Você não pode cancelar esse Apontamento: ${req.params.id}.`,
-      });
+      return res
+        .json({
+          error: `Você não pode cancelar um Apontamento de outro usuário.`,
+        })
+        .status(401);
     }
 
     const dateSub = subHours(appointment.date, 2);
     if (isBefore(dateSub, new Date())) {
-      return res.status(401).json({
-        error: `Cancelamento não permitido. Ultrapassou a data limite: ${format(
-          dateSub,
-          'dd/MM/yyyy HH:mm'
-        )}`,
-      });
+      return res
+        .json({
+          error: `Cancelamento não permitido. Ultrapassou a data limite: ${format(
+            dateSub,
+            'dd/MM/yyyy HH:mm'
+          )}`,
+        })
+        .status(401);
     }
 
     appointment.canceled_at = new Date();

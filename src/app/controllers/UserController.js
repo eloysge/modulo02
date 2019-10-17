@@ -7,7 +7,7 @@ class UserController {
     const schema = Yup.object().shape({
       name: Yup.string().required('O nome é obrigatório'),
       email: Yup.string()
-        .email()
+        .email('E-mail é inválido')
         .required('O e-mail é obrigatório'),
       password: Yup.string()
         .required('A senha é obrigatória')
@@ -24,7 +24,7 @@ class UserController {
 
     const checkEmail = await User.findOne({ where: { email: req.body.email } });
     if (checkEmail) {
-      return res.json({ error: 'E-mail já cadastrado' });
+      return res.json({ error: 'E-mail já cadastrado' }).status(400);
     }
 
     const { id, name, email, provider } = await User.create(req.body);
@@ -77,18 +77,20 @@ class UserController {
     if (email !== user.email) {
       const checkEmail = await User.findOne({ where: { email } });
       if (checkEmail) {
-        return res.json({ error: 'Email já cadastrado !' });
+        return res.json({ error: 'Email já cadastrado !' }).status(400);
       }
     }
 
     if (password && !oldPassword) {
-      return res.json({
-        error: 'Para alterar a senha, informe a senha anterior',
-      });
+      return res
+        .json({
+          error: 'Para alterar a senha, informe a senha anterior',
+        })
+        .status(400);
     }
 
     if (oldPassword && !(await user.checkPassword(oldPassword))) {
-      return res.json({ error: 'Senha anterior não confere' });
+      return res.json({ error: 'Senha anterior não confere' }).status(400);
     }
 
     await user.update(req.body);

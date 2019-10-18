@@ -7,6 +7,7 @@ import {
   format,
   isAfter,
 } from 'date-fns';
+import { utcToZonedTime } from 'date-fns-tz';
 import { Op } from 'sequelize';
 import User from '../models/User';
 import Appointment from '../models/Appointment';
@@ -21,7 +22,15 @@ class AvailableController {
       });
     }
 
-    const searchDate = Number(date);
+    const timezone = 'America/Sao_Paulo';
+    // const { timezone } = req.query;
+    // if (!timezone) {
+    //   return res
+    //     .status(401)
+    //     .json({ error: 'O parâmetro [timezone] é obrigatório' });
+    // }
+
+    const searchDate = Number(utcToZonedTime(date, timezone));
 
     const checkUserProvider = await User.findOne({
       where: {

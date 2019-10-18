@@ -22,3 +22,19 @@ CREATE DATABASE gobarber;
 \l
 \q
 exit
+
+criar estrutura das tabelas no postgres:
+npx sequelize db:migrate
+
+verificar se o serviço esta rodando na porta 3333:
+lsof -i :3333
+
+instalação do pm2:
+sudo npm install -g pm2
+
+adicionando servicos:
+pm2 start build/server.js
+pm2 start build/queue.js
+
+para iniciar automaticamente apos reboot:
+pm2 startup systemd

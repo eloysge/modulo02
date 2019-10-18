@@ -94,7 +94,9 @@ class AvailableController {
 
       return {
         time,
-        value: format(value, "yyyy-MM-dd'T'HH:mm:ssxxx"),
+        value: format(value, "yyyy-MM-dd'T'HH:mm:ssxxx", {
+          timeZone: `${timezone}`,
+        }),
         available: isAfter(value, compareDate) && !cliente,
       };
     });

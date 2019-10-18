@@ -19,8 +19,17 @@ class Mail {
     this.configureTemplates();
   }
 
+  // foi adicionado '..', 'src', para funcionar a queue, apos o build.
   configureTemplates() {
-    const viewPath = resolve(__dirname, '..', 'app', 'views', 'emails');
+    const viewPath = resolve(
+      __dirname,
+      '..',
+      '..',
+      'src',
+      'app',
+      'views',
+      'emails'
+    );
 
     this.transporter.use(
       'compile',

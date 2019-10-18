@@ -38,6 +38,8 @@
   },
   "scripts": {
     "dev": "nodemon src/server.js",
-    "queue": "nodemon src/queues.js"
+    "queue": "nodemon src/queues.js",
+    "build": "sucrase ./src -d ./build --transforms imports",
+    "start": "node build/server.js"
   }
 }

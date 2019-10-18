@@ -94,9 +94,10 @@ class AvailableController {
 
       return {
         time,
-        value: format(value, "yyyy-MM-dd'T'HH:mm:ssxxx", {
-          timeZone: 'America/Sao_Paulo',
-        }),
+        value: format(
+          utcToZonedTime(value, timezone),
+          "yyyy-MM-dd'T'HH:mm:sszzzz"
+        ),
         available: isAfter(value, compareDate) && !cliente,
       };
     });

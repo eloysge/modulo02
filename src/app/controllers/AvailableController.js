@@ -30,7 +30,7 @@ class AvailableController {
     //     .json({ error: 'O parâmetro [timezone] é obrigatório' });
     // }
 
-    const searchDate = Number(utcToZonedTime(date, timezone));
+    const searchDate = Number(date);
 
     const checkUserProvider = await User.findOne({
       where: {
@@ -90,10 +90,12 @@ class AvailableController {
         appointment => format(appointment.date, 'HH:mm') === time
       );
 
+      const compareDate = utcToZonedTime(new Date(), timezone);
+
       return {
         time,
         value: format(value, "yyyy-MM-dd'T'HH:mm:ssxxx"),
-        available: isAfter(value, new Date()) && !cliente,
+        available: isAfter(value, compareDate) && !cliente,
       };
     });
 

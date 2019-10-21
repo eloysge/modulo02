@@ -7,7 +7,7 @@ import {
   format,
   isAfter,
 } from 'date-fns';
-import { utcToZonedTime } from 'date-fns-tz';
+import { utcToZonedTime, zonedTimeToUtc } from 'date-fns-tz';
 import { Op } from 'sequelize';
 import User from '../models/User';
 import Appointment from '../models/Appointment';
@@ -70,6 +70,8 @@ class AvailableController {
       '19:00',
     ];
 
+    const compareDate = utcToZonedTime(new Date(), timeZone);
+
     const available = schedule.map(time => {
       const [hour, minute] = time.split(':');
       const value = setSeconds(
@@ -81,11 +83,9 @@ class AvailableController {
         appointment => format(appointment.date, 'HH:mm') === time
       );
 
-      const compareDate = utcToZonedTime(new Date(), timeZone);
-
       return {
         time,
-        value: format(value, "yyyy-MM-dd'T'HH:mm:ssxxx"),
+        value: format(zonedTimeToUtc(value), "yyyy-MM-dd'T'HH:mm:ssxxx"),
         available: isAfter(value, compareDate) && !cliente,
       };
     });

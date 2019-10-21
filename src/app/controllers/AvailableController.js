@@ -80,7 +80,8 @@ class AvailableController {
       );
 
       const cliente = appointments.find(
-        appointment => format(appointment.date, 'HH:mm') === time
+        appointment =>
+          format(utcToZonedTime(appointment.date, timeZone), 'HH:mm') === time
       );
 
       return {

@@ -97,7 +97,7 @@ class AppointmentController {
     /**
      * Checar se a data é posterior
      */
-    const hourStart = startOfHour(utcToZonedTime(parseISO(date), timeZone));
+    const hourStart = startOfHour(parseISO(date));
     const actualDate = format(
       utcToZonedTime(new Date(), timeZone),
       "dd/MM/yyyy H:mm'h'",
@@ -121,7 +121,7 @@ class AppointmentController {
       where: {
         user_id: req.userID,
         canceled_at: null,
-        date: hourStart,
+        date: utcToZonedTime(hourStart, timeZone),
       },
     });
     if (checkConflit) {

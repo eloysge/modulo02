@@ -97,7 +97,7 @@ class AppointmentController {
     /**
      * Checar se a data é posterior
      */
-    const hourStart = startOfHour(parseISO(date));
+    const hourStart = startOfHour(utcToZonedTime(parseISO(date), timeZone));
     const actualDate = format(
       utcToZonedTime(new Date(), timeZone),
       "dd/MM/yyyy H:mm'h'",

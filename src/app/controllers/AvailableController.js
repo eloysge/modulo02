@@ -85,7 +85,7 @@ class AvailableController {
 
       return {
         time,
-        value: format(value, "yyyy-MM-dd'T'HH:mm"),
+        value: format(value, "yyyy-MM-dd'T'HH:mm:ssxxx"),
         available: isAfter(value, compareDate) && !cliente,
       };
     });

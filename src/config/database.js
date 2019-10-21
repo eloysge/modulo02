@@ -9,7 +9,6 @@ module.exports = {
   database: process.env.DB_NAME,
   logging: false,
   define: {
-    timezone: 'America/Sao_Paulo',
     timestamps: true,
     underscored: true,
     underscoredAll: true,

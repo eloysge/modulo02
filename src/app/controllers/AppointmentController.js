@@ -121,7 +121,7 @@ class AppointmentController {
       where: {
         user_id: req.userID,
         canceled_at: null,
-        date: utcToZonedTime(hourStart, timeZone),
+        date: hourStart,
       },
     });
     if (checkConflit) {

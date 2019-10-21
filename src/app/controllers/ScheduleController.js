@@ -8,7 +8,7 @@ import {
   isEqual,
   isBefore,
 } from 'date-fns';
-import { utcToZonedTime } from 'date-fns-tz';
+// import { utcToZonedTime, zonedTimeToUtc } from 'date-fns-tz';
 import { Op } from 'sequelize';
 import Appointment from '../models/Appointment';
 import User from '../models/User';
@@ -43,7 +43,7 @@ class ScheduleController {
         .json({ error: 'O usuário deve ser um [provider]' });
     }
 
-    const { date, timeZone = 'America/Sao_Paulo' } = req.query;
+    const { date } = req.query;
     if (!date) {
       return res
         .status(401)
@@ -83,10 +83,13 @@ class ScheduleController {
         setMinutes(setHours(parsedDate, hora), minuto),
         0
       );
-      const compareDate = utcToZonedTime(checkDate, timezone);
+
+      // const compareDate = utcToZonedTime(checkDate, timezone);
+      const compareDate = checkDate;
+
       return {
         time: `${hora}:${minuto}h`,
-        past: isBefore(compareDate, utcToZonedTime(new Date(), timeZone)),
+        past: isBefore(compareDate, new Date()),
         appointment: appointments.find(a => isEqual(a.date, compareDate)),
       };
     });

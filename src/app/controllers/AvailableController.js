@@ -91,6 +91,7 @@ class AvailableController {
         ),
         available: isAfter(value, compareDate) && !cliente,
         cliente,
+        teste: true,
       };
     });
 

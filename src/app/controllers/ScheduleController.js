@@ -43,7 +43,7 @@ class ScheduleController {
         .json({ error: 'O usuário deve ser um [provider]' });
     }
 
-    const { date } = req.query;
+    const { date, timeZone = 'America/Sao_Paulo' } = req.query;
     if (!date) {
       return res
         .status(401)
@@ -86,10 +86,7 @@ class ScheduleController {
       const compareDate = utcToZonedTime(checkDate, timezone);
       return {
         time: `${hora}:${minuto}h`,
-        past: isBefore(
-          compareDate,
-          utcToZonedTime(new Date(), process.env.TIME_ZONE)
-        ),
+        past: isBefore(compareDate, utcToZonedTime(new Date(), timeZone)),
         appointment: appointments.find(a => isEqual(a.date, compareDate)),
       };
     });

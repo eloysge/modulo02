@@ -21,11 +21,9 @@ import Queue from '../../lib/Queue';
 
 class AppointmentController {
   async index(req, res) {
-    const { page = 1 } = req.query;
+    const { page = 1, timeZone = 'America/Sao_Paulo' } = req.query;
 
-    const searchDate = Number(
-      subDays(utcToZonedTime(new Date(), process.env.TIME_ZONE), 1)
-    );
+    const searchDate = Number(subDays(utcToZonedTime(new Date(), timeZone), 1));
 
     const appointment = await Appointment.findAll({
       where: {
@@ -80,7 +78,7 @@ class AppointmentController {
       return res.status(400);
     }
 
-    const { provider_id, date } = req.body;
+    const { provider_id, date, timeZone = 'America/Sao_Paulo' } = req.body;
 
     /**
      * Checar se usuário indicado é um "provider".
@@ -101,16 +99,14 @@ class AppointmentController {
      */
     const hourStart = startOfHour(parseISO(date));
     const actualDate = format(
-      utcToZonedTime(new Date(), process.env.TIME_ZONE),
+      utcToZonedTime(new Date(), timeZone),
       "dd/MM/yyyy H:mm'h'",
       {
         locale: pt,
       }
     );
 
-    if (
-      isBefore(hourStart, utcToZonedTime(new Date(), process.env.TIME_ZONE))
-    ) {
+    if (isBefore(hourStart, utcToZonedTime(new Date(), timeZone))) {
       return res
         .json({
           error: `A data do agendamento deve ser posterior a ${actualDate}`,
@@ -235,8 +231,9 @@ class AppointmentController {
         .status(401);
     }
 
+    const timeZone = 'America/Sao_Paulo';
     const dateSub = subHours(appointment.date, 2);
-    if (isBefore(dateSub, utcToZonedTime(new Date(), process.env.TIME_ZONE))) {
+    if (isBefore(dateSub, utcToZonedTime(new Date(), timeZone))) {
       return res
         .json({
           error: `Cancelamento não permitido. Ultrapassou a data limite: ${format(

@@ -85,7 +85,10 @@ class AvailableController {
 
       return {
         time,
-        value: format(zonedTimeToUtc(value), "yyyy-MM-dd'T'HH:mm:ssxxx"),
+        value: format(
+          zonedTimeToUtc(value, timeZone),
+          "yyyy-MM-dd'T'HH:mm:ssxxx"
+        ),
         available: isAfter(value, compareDate) && !cliente,
       };
     });

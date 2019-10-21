@@ -82,10 +82,7 @@ class AvailableController {
         appointment => format(appointment.date, 'HH:mm') === time
       );
 
-      const compareDate = utcToZonedTime(
-        new Date(),
-        String(process.env.TIME_ZONE)
-      );
+      const compareDate = utcToZonedTime(new Date(), process.env.TIME_ZONE);
 
       return {
         time,

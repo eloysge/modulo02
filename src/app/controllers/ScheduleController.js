@@ -86,7 +86,10 @@ class ScheduleController {
       const compareDate = utcToZonedTime(checkDate, timezone);
       return {
         time: `${hora}:${minuto}h`,
-        past: isBefore(compareDate, new Date()),
+        past: isBefore(
+          compareDate,
+          utcToZonedTime(new Date(), process.env.TIME_ZONE)
+        ),
         appointment: appointments.find(a => isEqual(a.date, compareDate)),
       };
     });

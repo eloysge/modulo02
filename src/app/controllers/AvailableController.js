@@ -22,14 +22,6 @@ class AvailableController {
       });
     }
 
-    const timezone = 'America/Sao_Paulo';
-    // const { timezone } = req.query;
-    // if (!timezone) {
-    //   return res
-    //     .status(401)
-    //     .json({ error: 'O parâmetro [timezone] é obrigatório' });
-    // }
-
     const searchDate = Number(date);
 
     const checkUserProvider = await User.findOne({
@@ -90,7 +82,7 @@ class AvailableController {
         appointment => format(appointment.date, 'HH:mm') === time
       );
 
-      const compareDate = utcToZonedTime(new Date(), timezone);
+      const compareDate = utcToZonedTime(new Date(), process.env.TIME_ZONE);
 
       return {
         time,

@@ -9,6 +9,7 @@ import {
   subDays,
 } from 'date-fns';
 import pt from 'date-fns/locale/pt';
+import { utcToZonedTime } from 'date-fns-tz';
 import User from '../models/User';
 import File from '../models/File';
 import Appointment from '../models/Appointment';
@@ -21,7 +22,10 @@ import Queue from '../../lib/Queue';
 class AppointmentController {
   async index(req, res) {
     const { page = 1 } = req.query;
-    const searchDate = Number(subDays(new Date(), 1));
+
+    const searchDate = Number(
+      subDays(utcToZonedTime(new Date(), process.env.TIME_ZONE), 1)
+    );
 
     const appointment = await Appointment.findAll({
       where: {
@@ -96,11 +100,17 @@ class AppointmentController {
      * Checar se a data é posterior
      */
     const hourStart = startOfHour(parseISO(date));
-    const actualDate = format(new Date(), "dd/MM/yyyy H:mm'h'", {
-      locale: pt,
-    });
+    const actualDate = format(
+      utcToZonedTime(new Date(), process.env.TIME_ZONE),
+      "dd/MM/yyyy H:mm'h'",
+      {
+        locale: pt,
+      }
+    );
 
-    if (isBefore(hourStart, new Date())) {
+    if (
+      isBefore(hourStart, utcToZonedTime(new Date(), process.env.TIME_ZONE))
+    ) {
       return res
         .json({
           error: `A data do agendamento deve ser posterior a ${actualDate}`,
@@ -226,7 +236,7 @@ class AppointmentController {
     }
 
     const dateSub = subHours(appointment.date, 2);
-    if (isBefore(dateSub, new Date())) {
+    if (isBefore(dateSub, utcToZonedTime(new Date(), process.env.TIME_ZONE))) {
       return res
         .json({
           error: `Cancelamento não permitido. Ultrapassou a data limite: ${format(

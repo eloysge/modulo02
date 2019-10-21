@@ -1,5 +1,6 @@
 import Sequelize, { Model } from 'sequelize';
 import { isBefore, subHours } from 'date-fns';
+import { utcToZonedTime } from 'date-fns-tz';
 
 class Appointment extends Model {
   static init(sequelize) {
@@ -10,13 +11,19 @@ class Appointment extends Model {
         past: {
           type: Sequelize.VIRTUAL,
           get() {
-            return isBefore(this.date, new Date());
+            return isBefore(
+              this.date,
+              utcToZonedTime(new Date(), process.env.TIME_ZONE)
+            );
           },
         },
         cancelable: {
           type: Sequelize.VIRTUAL,
           get() {
-            return isBefore(new Date(), subHours(this.date, 2));
+            return isBefore(
+              utcToZonedTime(new Date(), process.env.TIME_ZONE),
+              subHours(this.date, 2)
+            );
           },
         },
       },

@@ -24,6 +24,8 @@ class AvailableController {
 
     const searchDate = Number(date);
 
+    const timeZone = process.env.TIME_ZONE;
+
     const checkUserProvider = await User.findOne({
       where: {
         id: req.params.providerID,
@@ -82,7 +84,7 @@ class AvailableController {
         appointment => format(appointment.date, 'HH:mm') === time
       );
 
-      const compareDate = utcToZonedTime(new Date(), process.env.TIME_ZONE);
+      const compareDate = utcToZonedTime(new Date(), timeZone);
 
       return {
         time,

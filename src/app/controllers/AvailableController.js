@@ -91,8 +91,6 @@ class AvailableController {
           "yyyy-MM-dd'T'HH:mm:ssxxx"
         ),
         available: isAfter(value, compareDate) && !cliente,
-        cliente,
-        teste: true,
       };
     });
 

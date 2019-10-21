@@ -84,7 +84,7 @@ class AvailableController {
 
       const compareDate = utcToZonedTime(
         new Date(),
-        `${process.env.TIME_ZONE}`
+        String(process.env.TIME_ZONE)
       );
 
       return {

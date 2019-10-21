@@ -22,10 +22,9 @@ class AvailableController {
       });
     }
 
+    const timeZone = 'America/Sao_Paulo';
+
     const searchDate = Number(date);
-
-    const timeZone = process.env.TIME_ZONE;
-
     const checkUserProvider = await User.findOne({
       where: {
         id: req.params.providerID,

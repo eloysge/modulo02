@@ -80,8 +80,7 @@ class AvailableController {
       );
 
       const cliente = appointments.find(
-        appointment =>
-          format(utcToZonedTime(appointment.date, timeZone), 'HH:mm') === time
+        appointment => format(appointment.date, 'HH:mm') === time
       );
 
       return {
@@ -91,6 +90,7 @@ class AvailableController {
           "yyyy-MM-dd'T'HH:mm:ssxxx"
         ),
         available: isAfter(value, compareDate) && !cliente,
+        cliente,
       };
     });
 

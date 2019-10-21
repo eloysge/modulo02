@@ -8,7 +8,7 @@ import {
   isEqual,
   isBefore,
 } from 'date-fns';
-// import { utcToZonedTime, zonedTimeToUtc } from 'date-fns-tz';
+import { zonedTimeToUtc } from 'date-fns-tz';
 import { Op } from 'sequelize';
 import Appointment from '../models/Appointment';
 import User from '../models/User';
@@ -84,8 +84,7 @@ class ScheduleController {
         0
       );
 
-      // const compareDate = utcToZonedTime(checkDate, timezone);
-      const compareDate = checkDate;
+      const compareDate = zonedTimeToUtc(checkDate, timezone);
 
       return {
         time: `${hora}:${minuto}h`,

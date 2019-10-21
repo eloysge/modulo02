@@ -14,15 +14,13 @@ import Appointment from '../models/Appointment';
 
 class AvailableController {
   async index(req, res) {
-    const { date } = req.query;
+    const { date, timeZone = 'America/Sao_Paulo' } = req.query;
 
     if (!date) {
       return res.status(400).json({
         error: `A Data não foi informada.`,
       });
     }
-
-    const timeZone = 'America/Sao_Paulo';
 
     const searchDate = Number(date);
     const checkUserProvider = await User.findOne({

@@ -87,8 +87,7 @@ class ScheduleController {
       const compareDate = zonedTimeToUtc(checkDate, timeZone);
 
       return {
-        beginTime: startOfDay(parsedDate),
-        endTime: endOfDay(parsedDate),
+        date,
         time: `${hora}:${minuto}h`,
         past: isBefore(compareDate, new Date()),
         appointment: appointments.find(a => isEqual(a.date, compareDate)),

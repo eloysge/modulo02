@@ -1,4 +1,4 @@
-import { format, parseISO } from 'date-fns';
+import { format } from 'date-fns';
 import { utcToZonedTime } from 'date-fns-tz';
 import Mail from '../../lib/Mail';
 
@@ -11,15 +11,16 @@ class AppointmentMail {
     const { newAppointment, timeZone } = data;
     await Mail.sendMail({
       to: `${newAppointment.provider.name} <${newAppointment.provider.email}>`,
-      subject: `Novo Agendamento: ${timeZone}`,
+      subject: 'Novo Agendamento',
       template: 'appointment',
       context: {
         provider: newAppointment.provider.name,
         user: newAppointment.user.name,
         date: format(
-          utcToZonedTime(parseISO(newAppointment.date), timeZone),
+          utcToZonedTime(newAppointment.date, timeZone),
           'dd/MM/yyyy HH:mm'
         ),
+        timeZone,
       },
     });
   }

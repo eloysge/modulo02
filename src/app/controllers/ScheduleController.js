@@ -88,6 +88,7 @@ class ScheduleController {
 
       return {
         date: parseISO(date),
+        compareDate,
         time: `${hora}:${minuto}h`,
         past: isBefore(compareDate, new Date()),
         appointment: appointments.find(a => isEqual(a.date, compareDate)),

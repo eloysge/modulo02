@@ -105,8 +105,8 @@ class AppointmentController {
         locale: pt,
       }
     );
-
-    if (isBefore(hourStart, utcToZonedTime(new Date(), timeZone))) {
+    // if (isBefore(hourStart, utcToZonedTime(new Date(), timeZone))) {
+    if (isBefore(hourStart, new Date())) {
       return res
         .json({
           error: `A data do agendamento deve ser posterior a ${actualDate}`,
@@ -158,9 +158,13 @@ class AppointmentController {
      * Noficar agendamento ao provider
      */
     const user = await User.findByPk(req.userID);
-    const formattedDate = format(hourStart, "'dia' dd 'de' MMMM 'às' H:mm'h'", {
-      locale: pt,
-    });
+    const formattedDate = format(
+      utcToZonedTime(hourStart, timeZone),
+      "'dia' dd 'de' MMMM 'às' H:mm'h'",
+      {
+        locale: pt,
+      }
+    );
     await Notification.create({
       content: `Novo agendamento de ${user.name} para ${formattedDate}`,
       user: provider_id,
@@ -185,6 +189,7 @@ class AppointmentController {
     });
     await Queue.add(AppointmentMail.key, {
       newAppointment,
+      timeZone,
     });
 
     return res.json(newAppointment);

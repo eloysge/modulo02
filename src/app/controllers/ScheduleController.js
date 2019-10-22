@@ -50,14 +50,14 @@ class ScheduleController {
         .json({ error: 'O parâmetro [date] é obrigatório' });
     }
 
-    const { timezone } = req.query;
-    if (!timezone) {
+    const { timeZone } = req.query;
+    if (!timeZone) {
       return res
         .status(401)
-        .json({ error: 'O parâmetro [timezone] é obrigatório' });
+        .json({ error: 'O parâmetro [timeZone] é obrigatório' });
     }
 
-    const parsedDate = parseISO(date);
+    const parsedDate = zonedTimeToUtc(parseISO(date), timeZone);
 
     const appointments = await Appointment.findAll({
       where: {
@@ -84,7 +84,7 @@ class ScheduleController {
         0
       );
 
-      const compareDate = zonedTimeToUtc(checkDate, timezone);
+      const compareDate = zonedTimeToUtc(checkDate, timeZone);
 
       return {
         time: `${hora}:${minuto}h`,

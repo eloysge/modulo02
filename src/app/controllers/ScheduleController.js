@@ -81,10 +81,12 @@ class ScheduleController {
     const data = range.map(hour => {
       const [hora, minuto] = hour.split(':');
       const checkDate = setMilliseconds(
-        setSeconds(setMinutes(setHours(parsedDate, hora), minuto), 0, 0)
+        setSeconds(setMinutes(setHours(parsedDate, hora), minuto), 0),
+        0
       );
 
-      const compareDate = zonedTimeToUtc(checkDate, timeZone);
+      // const compareDate = zonedTimeToUtc(checkDate, timeZone);
+      const compareDate = checkDate;
 
       return {
         date: parseISO(date),

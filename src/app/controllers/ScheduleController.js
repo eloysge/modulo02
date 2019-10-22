@@ -85,8 +85,7 @@ class ScheduleController {
         0
       );
 
-      // const compareDate = zonedTimeToUtc(checkDate, timeZone);
-      const compareDate = checkDate;
+      const compareDate = zonedTimeToUtc(checkDate, timeZone);
 
       return {
         date: parseISO(date),

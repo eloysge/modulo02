@@ -8,17 +8,16 @@ class AppointmentMail {
   }
 
   async handle({ data }) {
-    const { newAppointment } = data;
-    const { timeZone } = data;
+    const { newAppointment, timeZone } = data;
     await Mail.sendMail({
       to: `${newAppointment.provider.name} <${newAppointment.provider.email}>`,
-      subject: 'Novo Agendamento',
+      subject: `Novo Agendamento: ${timeZone}`,
       template: 'appointment',
       context: {
         provider: newAppointment.provider.name,
         user: newAppointment.user.name,
         date: format(
-          parseISO(utcToZonedTime(newAppointment.date, timeZone)),
+          utcToZonedTime(parseISO(newAppointment.date), timeZone),
           'dd/MM/yyyy HH:mm'
         ),
       },

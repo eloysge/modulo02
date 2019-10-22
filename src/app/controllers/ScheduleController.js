@@ -5,6 +5,7 @@ import {
   setHours,
   setMinutes,
   setSeconds,
+  setMilliseconds,
   isEqual,
   isBefore,
 } from 'date-fns';
@@ -79,9 +80,8 @@ class ScheduleController {
 
     const data = range.map(hour => {
       const [hora, minuto] = hour.split(':');
-      const checkDate = setSeconds(
-        setMinutes(setHours(parsedDate, hora), minuto),
-        0
+      const checkDate = setMilliseconds(
+        setSeconds(setMinutes(setHours(parsedDate, hora), minuto), 0, 0)
       );
 
       const compareDate = zonedTimeToUtc(checkDate, timeZone);

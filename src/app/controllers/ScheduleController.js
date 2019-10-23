@@ -44,18 +44,11 @@ class ScheduleController {
         .json({ error: 'O usuário deve ser um [provider]' });
     }
 
-    const { date } = req.query;
+    const { date, timeZone = 'America/Sao_Paulo' } = req.query;
     if (!date) {
       return res
         .status(401)
         .json({ error: 'O parâmetro [date] é obrigatório' });
-    }
-
-    const { timeZone } = req.query;
-    if (!timeZone) {
-      return res
-        .status(401)
-        .json({ error: 'O parâmetro [timeZone] é obrigatório' });
     }
 
     const parsedDate = zonedTimeToUtc(parseISO(date), timeZone);

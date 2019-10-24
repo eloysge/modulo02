@@ -81,6 +81,7 @@ class ScheduleController {
       const compareDate = zonedTimeToUtc(checkDate, timeZone);
 
       return {
+        parsedDate,
         compareDate,
         actualDate: new Date(),
         time: `${hora}:${minuto}h`,

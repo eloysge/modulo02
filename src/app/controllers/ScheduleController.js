@@ -51,7 +51,7 @@ class ScheduleController {
         .json({ error: 'O parâmetro [date] é obrigatório' });
     }
 
-    const parsedDate = zonedTimeToUtc(parseISO(date), timeZone);
+    const parsedDate = parseISO(date);
 
     const appointments = await Appointment.findAll({
       where: {
@@ -81,6 +81,8 @@ class ScheduleController {
       const compareDate = zonedTimeToUtc(checkDate, timeZone);
 
       return {
+        start: startOfDay(parsedDate),
+        end: endOfDay(parsedDate),
         parsedDate,
         compareDate,
         actualDate: new Date(),

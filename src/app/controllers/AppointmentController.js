@@ -23,7 +23,7 @@ class AppointmentController {
   async index(req, res) {
     const { page = 1 } = req.query;
 
-    const searchDate = Number(subDays(new Date(), 1));
+    const searchDate = Number(subDays(new Date(), 2));
 
     const appointment = await Appointment.findAll({
       where: {

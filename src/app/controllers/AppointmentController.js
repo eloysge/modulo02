@@ -1,13 +1,6 @@
 import * as Yup from 'yup';
 import { Op } from 'sequelize';
-import {
-  startOfHour,
-  parseISO,
-  isBefore,
-  format,
-  subHours,
-  subDays,
-} from 'date-fns';
+import { startOfHour, parseISO, isBefore, format, subHours } from 'date-fns';
 import pt from 'date-fns/locale/pt';
 import { utcToZonedTime } from 'date-fns-tz';
 import User from '../models/User';
@@ -23,7 +16,7 @@ class AppointmentController {
   async index(req, res) {
     const { page = 1 } = req.query;
 
-    const searchDate = Number(subDays(new Date(), 2));
+    const searchDate = subHours(new Date(), 36);
 
     const appointment = await Appointment.findAll({
       where: {

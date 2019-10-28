@@ -39,7 +39,8 @@
   "scripts": {
     "dev": "nodemon src/server.js",
     "queue": "nodemon src/queues.js",
+    "start": "node build/server.js",
     "build": "sucrase ./src -d ./build --transforms imports",
-    "start": "node build/server.js"
+    "postbuild": "cp src/views build/views"
   }
 }

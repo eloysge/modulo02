@@ -6,7 +6,7 @@ export default async (req, res, next) => {
   const authHeader = req.headers.authorization;
 
   if (!authHeader) {
-    return res.status(401).json({ error: 'TOKEN não informado' });
+    return res.status(402).json({ error: 'SOLICITAÇÃO NÃO AUTORIZADA' });
   }
 
   const [, token] = authHeader.split(' ');

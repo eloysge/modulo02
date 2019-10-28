@@ -41,3 +41,9 @@ pm2 start build/queue.js
 
 -para iniciar automaticamente apos reboot:
 pm2 startup systemd
+
+-instalação do NGINX
+sudo apt install nginx
+
+-configuração do NGINX
+sudo vim /etc/nginx/sites-available/default

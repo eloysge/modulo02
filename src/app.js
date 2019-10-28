@@ -26,13 +26,13 @@ class App {
     this.server.use(cors());
     this.server.use(express.json());
     this.server.use(
-      '/files',
+      '/gobarber/files',
       express.static(path.resolve(__dirname, '..', 'tmp', 'uploads'))
     );
   }
 
   routes() {
-    this.server.use(routes);
+    this.server.use('/gobarber', routes);
     this.server.use(Sentry.Handlers.errorHandler());
   }
 

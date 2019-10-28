@@ -41,6 +41,6 @@
     "queue": "nodemon src/queues.js",
     "start": "node build/server.js",
     "build": "sucrase ./src -d ./build --transforms imports",
-    "postbuild": "cp src/app/views build/app/views"
+    "postbuild": "cp -r src/app/views/ build/app/views/"
   }
 }

@@ -21,6 +21,7 @@ class AppointmentMail {
           'dd/MM/yyyy HH:mm'
         ),
         timeZone,
+        avatar: newAppointment.provider.avatar.url,
       },
     });
   }

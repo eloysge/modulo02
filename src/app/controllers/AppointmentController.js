@@ -171,7 +171,14 @@ class AppointmentController {
         {
           model: User,
           as: 'provider',
-          attributes: ['name', 'email'],
+          attributes: ['name', 'email', 'avatar_id'],
+          include: [
+            {
+              model: File,
+              as: 'avatar',
+              attributes: ['id', 'path', 'url'],
+            },
+          ],
         },
         {
           model: User,

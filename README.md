@@ -47,3 +47,6 @@ sudo apt install nginx
 
 -configuração do NGINX
 sudo vim /etc/nginx/sites-available/default
+
+-configuração https:
+https://certbot.eff.org/lets-encrypt/ubuntubionic-nginx

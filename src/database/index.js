@@ -24,6 +24,7 @@ class Database {
     this.mongoConnection = await Mongoose.connect(process.env.MONGO_URL, {
       useNewUrlParser: true,
       useFindAndModify: true,
+      useUnifiedTopology: true,
     });
   }
 }

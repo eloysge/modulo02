@@ -44,7 +44,7 @@ class ScheduleController {
         .json({ error: 'O usuário deve ser um [provider]' });
     }
 
-    const { date, timeZone = 'America/Sao_Paulo' } = req.query;
+    const { date, timeZone = '-03:00' } = req.query;
     if (!date) {
       return res
         .status(401)

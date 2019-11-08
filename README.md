@@ -25,6 +25,8 @@ exit
 
 -criar estrutura das tabelas no postgres:
 npx sequelize db:migrate
+ou
+yarn sequelize db:migrate
 
 -verificar se o serviço esta rodando na porta 3333:
 lsof -i :3333

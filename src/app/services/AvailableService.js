@@ -8,7 +8,7 @@ import {
   isAfter,
 } from 'date-fns';
 import { Op } from 'sequelize';
-import { utcToZonedTime } from 'date-fns-tz';
+import { utcToZonedTime, zonedTimeToUtc } from 'date-fns-tz';
 import User from '../models/User';
 import Appointment from '../models/Appointment';
 
@@ -75,7 +75,7 @@ class AvailableService {
       return {
         time,
         value: format(
-          utcToZonedTime(value, timeZone),
+          zonedTimeToUtc(value, timeZone),
           "yyyy-MM-dd'T'HH:mm:ssxxx"
         ),
         available: isAfter(value, compareDate) && !cliente,

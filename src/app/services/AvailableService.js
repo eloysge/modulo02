@@ -74,7 +74,10 @@ class AvailableService {
 
       return {
         time,
-        value: format(value, "yyyy-MM-dd'T'HH:mm:ssxxx"),
+        value: format(
+          utcToZonedTime(value, timeZone),
+          "yyyy-MM-dd'T'HH:mm:ssxxx"
+        ),
         available: isAfter(value, compareDate) && !cliente,
       };
     });

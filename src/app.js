@@ -64,11 +64,11 @@ class App {
 
   exceptionHandler() {
     this.server.use(async (err, req, res, next) => {
+      const { error } = await new Youch(err, req).toJSON();
       if (process.env.NODE_ENV === 'development') {
-        const { error } = await new Youch(err, req).toJSON();
         return res.status(500).json(error);
       }
-      return res.status(500).json({ error: 'Erro interno do servidor' });
+      return res.status(500).json(error);
     });
   }
 }

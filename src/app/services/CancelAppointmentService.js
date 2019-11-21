@@ -4,6 +4,7 @@ import Queue from '../../lib/Queue';
 import CancellationMail from '../jobs/CancellationMail';
 
 import QueryAppointmentService from './QueryAppointmentService';
+import Cache from '../../lib/Cache';
 
 class CancelAppointmentService {
   async run({ appointment_id, user_id, timeZone }) {
@@ -52,6 +53,11 @@ class CancelAppointmentService {
       appointment,
       timeZone,
     });
+
+    /**
+     * Invalidar cache
+     */
+    Cache.invalidatePrefix(`user:${user_id}:appointments`);
 
     return appointment;
   }

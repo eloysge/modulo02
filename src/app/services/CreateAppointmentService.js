@@ -8,6 +8,7 @@ import AppointmentMail from '../jobs/AppointmentMail';
 import Queue from '../../lib/Queue';
 
 import QueryAppointmentService from './QueryAppointmentService';
+import Cache from '../../lib/Cache';
 
 class CreateAppointmentService {
   async run({ provider_id, user_id, date, timeZone }) {
@@ -100,6 +101,11 @@ class CreateAppointmentService {
       newAppointment,
       timeZone,
     });
+
+    /**
+     * Invalidar cache
+     */
+    Cache.invalidatePrefix(`user:${user_id}:appointments`);
 
     return newAppointment;
   }

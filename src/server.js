@@ -101,4 +101,15 @@ app.listen(3333);
  * instalação dependencias:
  * yarn add dotenv
  *
+ * instalando cliente do Redis, para controle do cache:
+ * yarn add ioredis
+ *
+ * instalando express-brute - segurança tentativas de logon inválido
+ * yarn add express-brute express-brute-redis
+ *
+ * instalando helmet - segurança contra script-injection (headers)
+ * yarn add helmet
+ *
+ * instalando express-rate-limit redis rate-limit-redis - segurança requisições
+ * yarn add express-rate-limit redis rate-limit-redis
  */

@@ -6,10 +6,18 @@ import Appointment from '../models/Appointment';
 
 import CreateAppointmentService from '../services/CreateAppointmentService';
 import CancelAppointmentService from '../services/CancelAppointmentService';
+import Cache from '../../lib/Cache';
 
 class AppointmentController {
   async index(req, res) {
     const { page = 1 } = req.query;
+
+    const cacheKey = `user:${req.userID}:appointments:${page}`;
+    const cached = await Cache.get(cacheKey);
+
+    if (cached) {
+      return res.json(cached);
+    }
 
     const searchDate = subHours(new Date(), 36);
 
@@ -47,6 +55,9 @@ class AppointmentController {
       ],
       order: [['date', 'DESC']],
     });
+
+    await Cache.set(cacheKey, appointment);
+
     return res.json(appointment);
   }
 

@@ -26,6 +26,9 @@ class SessionController {
     }
 
     const { id, name, avatar, provider } = user;
+    const token = jwt.sign({ id }, authConfig.secret, {
+      expiresIn: authConfig.expiresIn,
+    });
 
     return res.json({
       user: {
@@ -36,9 +39,7 @@ class SessionController {
         avatar,
         timeLive: authConfig.expiresIn,
       },
-      token: jwt.sign({ id }, authConfig.secret, {
-        expiresIn: authConfig.expiresIn,
-      }),
+      token,
     });
   }
 }

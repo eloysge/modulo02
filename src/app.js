@@ -51,7 +51,7 @@ class App {
             }),
           }),
           windowMs: 1000 * 60 * 1,
-          max: 6,
+          max: 60,
         })
       );
     }
